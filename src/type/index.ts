@@ -34,3 +34,17 @@ export interface userFromType {
   address: string;
   postalCode: string;
 }
+
+export interface experienceFormType {
+  _id: "";
+  company: string;
+  position: string;
+  startDate: Date;
+  endDate: Date;
+  location: string;
+  responsibilities: string[];
+  projects: string[];
+  userId: string;
+  formNumber: number;
+  description: string;
+}
