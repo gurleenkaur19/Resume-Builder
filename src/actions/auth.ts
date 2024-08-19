@@ -1,6 +1,6 @@
 "use server";
 import { connectDB } from "@/database/mongodb";
-import User from "@/database/models/User";
+import User from "@/database/models/User.model";
 import bcrypt from "bcryptjs";
 
 export const register = async (formData: FormData) => {

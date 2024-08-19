@@ -18,13 +18,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import axios from "axios";
+import { toast } from "../ui/use-toast";
 import { experienceFormType } from "@/type";
 import { Textarea } from "../ui/textarea";
 
 const ExperienceForm = ({
   experienceFormData,
+  handleDeleteExperience,
+  setUpdateNumber,
 }: {
   experienceFormData: experienceFormType;
+  handleDeleteExperience: (id: string) => void;
+  setUpdateNumber: (prev: (prev: number) => number) => void;
 }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -57,6 +63,13 @@ const ExperienceForm = ({
     setProjects(updatedProjects);
   };
 
+  const handleDeleteProject = (index: number) => {
+    if (projects.length > 1) {
+      const updatedProjects = projects.filter((_, i) => i !== index);
+      setProjects(updatedProjects);
+    }
+  };
+
   // Functions for managing responsibilities
   const handleAddResponsibility = () => {
     setResponsibilities([...responsibilities, ""]);
@@ -74,6 +87,99 @@ const ExperienceForm = ({
         (_, i) => i !== index
       );
       setResponsibilities(updatedResponsibilities);
+    }
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError("");
+
+    if (
+      !companyName ||
+      !position ||
+      !startDate ||
+      !endDate ||
+      !location ||
+      projects.some((project) => !project) ||
+      responsibilities.some((responsibility) => !responsibility)
+    ) {
+      setError("Please make sure all fields are filled out correctly!");
+
+      setLoading(false);
+      return;
+    }
+
+    const formData = {
+      _id: experienceFormData._id,
+      userId: experienceFormData.userId,
+      formNumber: experienceFormData.formNumber,
+      company: companyName,
+      position,
+      startDate,
+      endDate,
+      location,
+      description,
+      responsibilities,
+      projects,
+    };
+    // Send the formData to your backend API endpoint
+    if (formData._id) {
+      // update
+      const response = await axios.post(
+        `/api/experience/${formData._id}`,
+        formData
+      );
+      const data = response.data;
+      if (data.success) {
+        toast({
+          title: "Experience Updated",
+          description: "Your experience has been successfully updated!",
+        });
+      } else {
+        toast({
+          title: "Error Updating Experience",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    } else {
+      // create
+      const response = await axios.post("/api/experience", formData);
+      const data = response.data;
+      if (data.success) {
+        setUpdateNumber((prev: number) => prev + 1);
+        toast({
+          title: "Experience Saved",
+          description: "Your experience has been successfully saved!",
+        });
+      } else {
+        toast({
+          title: "Error Saving Experience",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    }
+    setLoading(false);
+  };
+
+  const handleDelete = async () => {
+    const response = await axios.delete(
+      `/api/experience/${experienceFormData._id}`
+    );
+    const data = response.data;
+    if (data.success) {
+      handleDeleteExperience(experienceFormData._id);
+      toast({
+        title: "Experience Deleted",
+        description: "Your experience has been successfully deleted!",
+      });
+    } else {
+      toast({
+        title: "Error Deleting Experience",
+        description: data.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -200,7 +306,12 @@ const ExperienceForm = ({
                 <CirclePlusIcon />
               </Button>
               {projects.length > 1 && (
-                <Button type="button" variant="destructive" className="h-8">
+                <Button
+                  type="button"
+                  onClick={() => handleDeleteProject(index)}
+                  variant="destructive"
+                  className="h-8"
+                >
                   <Trash2Icon />
                 </Button>
               )}
@@ -281,12 +392,17 @@ const ExperienceForm = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button type="submit" size="lg" disabled={loading}>
+        <Button
+          type="submit"
+          size="lg"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
           {experienceFormData._id ? "Update" : "Save"}
           {loading && <Loader className="ml-2 animate-spin" />}
         </Button>
         {experienceFormData._id && (
-          <Button size="lg" variant="destructive">
+          <Button size="lg" variant="destructive" onClick={handleDelete}>
             Delete
           </Button>
         )}

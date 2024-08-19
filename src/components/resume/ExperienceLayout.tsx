@@ -5,10 +5,44 @@ import ExperienceForm from "./ExperienceForm";
 import { Button } from "../ui/button";
 import { experienceFormType } from "@/type";
 import { useSession } from "next-auth/react";
+import axios from "axios";
+import { toast } from "../ui/use-toast";
 
 const ExperienceLayout = () => {
   const { data: session } = useSession();
   const [forms, setForms] = useState<experienceFormType[]>([]);
+  const [updateNumber, setUpdateNumber] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `/api/experience/user/${session?.user._id}`
+        );
+        const data = response.data;
+        if (data.success) {
+          setForms(data.data); // Set the fetched data to state
+        } else {
+          toast({
+            title: "Experience fetch failed",
+            description: data.message || "Failed to fetch experiences",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching experiences.",
+          variant: "destructive",
+        });
+        console.error("Failed to fetch experiences:", error);
+      }
+    };
+
+    if (session?.user._id) {
+      fetchData();
+    }
+  }, [session?.user._id, updateNumber]);
 
   const handleAddExperience = () => {
     const counter =
@@ -34,6 +68,11 @@ const ExperienceLayout = () => {
     setForms([...forms, newForm]);
   };
 
+  const handleDeleteExperience = (formId: string) => {
+    const updatedForms = forms.filter((form) => form._id !== formId);
+    setForms(updatedForms);
+  };
+
   return (
     <div>
       <div className="flex justify-end">
@@ -46,7 +85,12 @@ const ExperienceLayout = () => {
         </Button>
       </div>
       {forms.map((form) => (
-        <ExperienceForm experienceFormData={form} key={form.formNumber} />
+        <ExperienceForm
+          experienceFormData={form}
+          key={form.formNumber}
+          handleDeleteExperience={handleDeleteExperience}
+          setUpdateNumber={setUpdateNumber}
+        />
       ))}
     </div>
   );

@@ -17,6 +17,21 @@ export interface UserDocument {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface ExperienceDocument {
+  _id: string;
+  company: string;
+  position: string;
+  startDate: Date;
+  endDate: Date;
+  location: string;
+  responsibilities: string[];
+  projects: string[];
+  description: string;
+  userId: string;
+  formNumber: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 export interface NavItemType {
   title: string;
   href: string;
