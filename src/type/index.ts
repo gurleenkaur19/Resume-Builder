@@ -22,3 +22,15 @@ export interface NavItemType {
   href: string;
   icon: string;
 }
+
+export interface userFromType {
+  _id: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  majorSkill: string;
+  phoneNumber: string;
+  address: string;
+  postalCode: string;
+}
