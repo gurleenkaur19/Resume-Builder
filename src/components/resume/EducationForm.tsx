@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon, Loader } from "lucide-react";
 import { Calendar } from "../ui/calendar";
 import { format } from "date-fns";
+import axios from "axios";
+import { toast } from "../ui/use-toast";
 import { Textarea } from "../ui/textarea";
 
 const EducationForm = ({
@@ -30,6 +32,102 @@ const EducationForm = ({
   );
   const [description, setDescription] = useState(educationFormData.description);
   const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    setError("");
+    setLoading(true);
+    if (!institution || !degree || !startDate || !endDate) {
+      setError("Please fill all the fields");
+      setLoading(false);
+      return;
+    }
+
+    const formData = {
+      _id: educationFormData._id,
+      userId: educationFormData.userId,
+      institution,
+      degree,
+      startDate,
+      endDate,
+      description,
+      formNumber: educationFormData.formNumber,
+    };
+
+    try {
+      if (!educationFormData._id) {
+        //create
+        const response = await axios.post("/api/education", formData);
+        const data = response.data;
+        if (data.success) {
+          setUpdateNumber((prev: number) => prev + 1);
+          toast({
+            title: "Education data saved successfully!",
+            description: "Your updated education data has been saved.",
+          });
+        } else {
+          toast({
+            title: "Failed to save education data!",
+            description: "An error occurred while saving your education data.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        //update
+        const response = await axios.post(
+          `/api/education/${educationFormData._id}`,
+          formData
+        );
+        const data = response.data;
+        if (data.success) {
+          toast({
+            title: "Education data updated successfully!",
+            description: "Your updated education data has been saved.",
+          });
+        } else {
+          toast({
+            title: "Failed to save education data!",
+            description: "An error occurred while saving your education data.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (err) {
+      toast({
+        title: "Failed to save education data!",
+        description: "An error occurred while saving your education data.",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete(
+        `/api/education/${educationFormData._id}`
+      );
+      const data = response.data;
+      if (data.success) {
+        handleDeleteEducation(educationFormData._id);
+        toast({
+          title: "Education data deleted successfully!",
+          description: "Your education data has been deleted.",
+        });
+      } else {
+        toast({
+          title: "Failed to delete education data!",
+          description: "An error occurred while deleting your education data.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Failed to delete education data!",
+        description: "An error occurred while deleting your education data.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div>
@@ -145,12 +243,17 @@ const EducationForm = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button type="submit" size="lg" disabled={loading}>
+        <Button
+          type="submit"
+          size="lg"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
           {educationFormData._id ? "Update" : "Save"}
           {loading && <Loader className="ml-2 animate-spin" />}
         </Button>
         {educationFormData._id && (
-          <Button size="lg" variant="destructive">
+          <Button size="lg" variant="destructive" onClick={handleDelete}>
             Delete
           </Button>
         )}

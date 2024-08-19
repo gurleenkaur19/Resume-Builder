@@ -32,6 +32,20 @@ export interface ExperienceDocument {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface EducationDocument {
+  _id: string;
+  institution: string;
+  degree: string;
+  startDate: Date;
+  endDate: Date;
+  description: string;
+  userId: string;
+  formNumber: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface NavItemType {
   title: string;
   href: string;
