@@ -48,3 +48,14 @@ export interface experienceFormType {
   formNumber: number;
   description: string;
 }
+
+export interface educationFormType {
+  _id: "";
+  institution: string;
+  degree: string;
+  startDate: Date;
+  endDate: Date;
+  userId: string;
+  formNumber: number;
+  description: string;
+}
