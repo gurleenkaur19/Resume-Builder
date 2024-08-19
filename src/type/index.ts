@@ -45,7 +45,20 @@ export interface EducationDocument {
   createdAt: Date;
   updatedAt: Date;
 }
-
+export interface ProjectDocument {
+  _id: string;
+  title: string;
+  description: string;
+  technologies: string[];
+  url: string;
+  screenshot: string;
+  startDate: Date;
+  endDate: Date;
+  userId: string;
+  formNumber: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 export interface NavItemType {
   title: string;
   href: string;

@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon, Loader, PlusCircle, XCircle } from "lucide-react";
 import { Calendar } from "../ui/calendar";
 import { format } from "date-fns";
+import axios from "axios";
+import { toast } from "../ui/use-toast";
 
 const ProjectForm = ({
   projectFormData,
@@ -44,6 +46,77 @@ const ProjectForm = ({
   const handleDeleteTechnology = (index: number) => {
     const updatedTechnologies = technologies.filter((_, i) => i !== index);
     setTechnologies(updatedTechnologies);
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    const formData = {
+      _id: projectFormData._id,
+      title,
+      description,
+      startDate,
+      endDate,
+      url,
+      technologies,
+      userId: projectFormData.userId,
+      formNumber: projectFormData.formNumber,
+    };
+    // Send the formData to your backend API endpoint
+    if (formData._id) {
+      // update
+      const response = await axios.post(
+        `/api/project/${formData._id}`,
+        formData
+      );
+      const data = response.data;
+      if (data.success) {
+        toast({
+          title: "Project Updated",
+          description: "Your project has been successfully updated!",
+        });
+      } else {
+        toast({
+          title: "Error Updating Project",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    } else {
+      // create
+      const response = await axios.post("/api/project", formData);
+      const data = response.data;
+      if (data.success) {
+        setUpdateNumber((prev) => prev + 1);
+        toast({
+          title: "Project Created",
+          description: "Your project has been successfully created!",
+        });
+      } else {
+        toast({
+          title: "Error Creating Project",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    }
+    setLoading(false);
+  };
+  const handleDelete = async () => {
+    const response = await axios.delete(`/api/project/${projectFormData._id}`);
+    const data = response.data;
+    if (data.success) {
+      handleDeleteProjectForm(projectFormData._id);
+      toast({
+        title: "Experience Deleted",
+        description: "Your experience has been successfully deleted!",
+      });
+    } else {
+      toast({
+        title: "Error Deleting Experience",
+        description: data.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -198,12 +271,17 @@ const ProjectForm = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button type="submit" size="lg" disabled={loading}>
+        <Button
+          type="submit"
+          size="lg"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
           {projectFormData._id ? "Update" : "Save"}
           {loading && <Loader className="ml-2 animate-spin" />}
         </Button>
         {projectFormData._id && (
-          <Button size="lg" variant="destructive">
+          <Button size="lg" variant="destructive" onClick={handleDelete}>
             Delete
           </Button>
         )}

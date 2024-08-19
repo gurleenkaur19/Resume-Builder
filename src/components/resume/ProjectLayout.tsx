@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { useSession } from "next-auth/react";
 import { projectFormType } from "@/type";
+import { toast } from "../ui/use-toast";
+import axios from "axios";
 import ProjectForm from "./ProjectForm";
 import { LoaderCircleIcon } from "lucide-react";
 
@@ -10,6 +12,38 @@ const ProjectLayout = () => {
   const [forms, setForms] = useState<projectFormType[]>([]);
   const [loading, setLoading] = useState(false);
   const [updateNumber, setUpdateNumber] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `/api/project/user/${session?.user._id}`
+        );
+        const data = response.data;
+        if (data.success) {
+          setForms(data.data); // Set the fetched data to state
+        } else {
+          toast({
+            title: "Error fetching project",
+            description: "An error occurred while fetching project details.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching project details.",
+          variant: "destructive",
+        });
+      }
+      setLoading(false);
+    };
+
+    if (session?.user._id) {
+      fetchData();
+    }
+  }, [session?.user._id, updateNumber]);
 
   const handleAddProject = async () => {
     const counter = forms.length ? forms[forms.length - 1].formNumber + 1 : 1;
