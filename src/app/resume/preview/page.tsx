@@ -1,6 +1,8 @@
 "use client";
 // pages/feature.tsx
 import React, { useEffect, useRef, useState } from "react";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { toast } from "@/components/ui/use-toast";
@@ -46,11 +48,58 @@ const FeaturePage = () => {
     }
   }, [session?.user._id]);
 
+  const constextRef = useRef(null);
+  const handlePDF = async () => {
+    try {
+      if (constextRef.current) {
+        const inputData = constextRef.current;
+
+        // Generate canvas from the input data
+        const canvas = await html2canvas(inputData, { scale: 2 });
+
+        // Get image data from the canvas
+        const imgData = canvas.toDataURL("image/png");
+
+        // Create a new jsPDF document
+        const doc = new jsPDF({
+          orientation: "portrait", // or "landscape" if needed
+          unit: "px",
+          format: [canvas.width, canvas.height], // Match the canvas size to the PDF size
+        });
+
+        // Calculate the maximum dimensions of the PDF page
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        // Calculate scaling to fit the image to the PDF page size
+        const scaleX = pageWidth / canvas.width;
+        const scaleY = pageHeight / canvas.height;
+        const scale = Math.min(scaleX, scaleY); // Fit image while maintaining aspect ratio
+
+        // Calculate the new dimensions of the image
+        const imgWidth = canvas.width * scale;
+        const imgHeight = canvas.height * scale;
+
+        // Calculate position to center the image on the page
+        const x = (pageWidth - imgWidth) / 2;
+        const y = (pageHeight - imgHeight) / 2;
+
+        // Add the image to the PDF
+        doc.addImage(imgData, "PNG", x, 0, imgWidth, imgHeight);
+
+        // Save the PDF
+        doc.save("mypdf.pdf");
+      }
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between mt-2 mx-5">
         <h1 className="text-center text-3xl">Preview Resume</h1>
-        <Button>Generate PDF</Button>
+        <Button onClick={handlePDF}>Generate PDF</Button>
       </div>
       <div className="m-4 rounded-md">
         <div className="p-6">
@@ -59,7 +108,7 @@ const FeaturePage = () => {
               <Loader className="w-24 h-24 animate-spin" />
             </div>
           ) : userAllData ? (
-            <div className="p-8 grid  border rounded-xl">
+            <div ref={constextRef} className="p-8 grid  border rounded-xl">
               <FullPdf userAllData={userAllData} />
             </div>
           ) : (

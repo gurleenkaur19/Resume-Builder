@@ -1,9 +1,4 @@
-import {
-  getAllDataByUserId,
-  getUserByEmail,
-  getUserById,
-  updateUserById,
-} from "@/database/service/user.service";
+import { getAllDataByUserId } from "@/database/service/user.service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
