@@ -18,7 +18,7 @@ const navItems: NavItemType[] = [
   },
   {
     title: "Contact",
-    href: "/resume/Contact",
+    href: "/resume/contact",
     icon: "PhoneIcon",
   },
 ];
