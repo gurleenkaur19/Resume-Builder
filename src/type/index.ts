@@ -71,3 +71,9 @@ export interface projectFormType {
   userId: string;
   formNumber: number;
 }
+
+export interface Skill {
+  name: string;
+  proficiency: string;
+  percentage: number;
+}

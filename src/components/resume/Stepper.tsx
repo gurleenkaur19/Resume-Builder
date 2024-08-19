@@ -1,5 +1,6 @@
 "use client";
 import ProjectLayout from "./ProjectLayout";
+import SkillsLayout from "./SkillsLayout";
 import {
   Box,
   BriefcaseBusiness,
@@ -40,6 +41,7 @@ export default function StepperExamples() {
                 {index == 1 && <ExperienceLayout />}
                 {index == 2 && <EducationLayout />}
                 {index == 3 && <ProjectLayout />}
+                {index === 4 && <SkillsLayout />}
               </div>
             </Step>
           );
