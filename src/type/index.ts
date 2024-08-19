@@ -59,6 +59,15 @@ export interface ProjectDocument {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface SkillsDocument {
+  _id: string;
+  skills: Skill[];
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface NavItemType {
   title: string;
   href: string;

@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import axios from "axios";
+import { toast } from "../ui/use-toast";
 import { Loader } from "lucide-react";
 
 const SkillsLayout = () => {
@@ -14,7 +16,42 @@ const SkillsLayout = () => {
   const [formId, setFormId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(false); // Add a state for initial data fetching
+  const [fetching, setFetching] = useState(true); // Add a state for initial data fetching
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setFetching(true);
+      try {
+        const response = await axios.get(
+          `/api/skills/user/${session?.user._id}`
+        );
+        const data = response.data;
+        if (data.success) {
+          setFormId(data.data._id);
+          setForms(data.data.skills); // Set the fetched data to state
+        } else {
+          toast({
+            title: "Experience fetch failed",
+            description: data.message || "Failed to fetch experiences",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching experiences.",
+          variant: "destructive",
+        });
+        console.error("Failed to fetch experiences:", error);
+      } finally {
+        setFetching(false); // Turn off the fetching loader
+      }
+    };
+
+    if (session?.user._id) {
+      fetchData();
+    }
+  }, [session?.user._id]);
 
   const handleAddSkills = () => {
     const newForm = {
@@ -32,18 +69,72 @@ const SkillsLayout = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    setError("");
+    setLoading(true);
+    const formData = {
+      userId: session?.user._id,
+      skills: forms,
+      _id: formId,
+    };
+
+    try {
+      if (!formId) {
+        //create
+        const response = await axios.post("/api/skills", formData);
+        const data = response.data;
+        if (data.success) {
+          toast({
+            title: "Skills saved successfully!",
+            description: "Your skills have been saved.",
+          });
+        } else {
+          toast({
+            title: "Failed to save skills!",
+            description: "An error occurred while saving your skills.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        //update
+        const response = await axios.post(`/api/skills/${formId}`, formData);
+        const data = response.data;
+        if (data.success) {
+          toast({
+            title: "Skills updated successfully!",
+            description: "Your skills have been updated.",
+          });
+        } else {
+          toast({
+            title: "Failed to update skills!",
+            description: "An error occurred while updating your skills.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "An error occurred while saving your skills.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false); // Turn off the saving/updating loader
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold mb-4">Skills</h1>
         <div className="flex justify-end gap-2">
           {formId ? (
-            <Button className="mb-2" disabled={loading}>
+            <Button className="mb-2" onClick={handleSubmit} disabled={loading}>
               {loading ? "Updating..." : "Update"}
               {loading && <Loader size="sm" className="ml-2" />}
             </Button>
           ) : (
-            <Button className="mb-2" disabled={loading}>
+            <Button className="mb-2" onClick={handleSubmit} disabled={loading}>
               {loading ? "Saving..." : "Save"}
               {loading && <Loader size="sm" className="ml-2" />}{" "}
             </Button>
