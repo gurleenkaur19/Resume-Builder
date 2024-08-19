@@ -5,7 +5,6 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useSession } from "next-auth/react";
 import { ResponseType, userFromType } from "@/type";
-import axios from "axios";
 
 const BasicUserDetailForm = () => {
   const { data: session } = useSession();
@@ -34,8 +33,10 @@ const BasicUserDetailForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const api = await axios.get(`/api/user/${session?.user._id}`);
-        const response = await api.data;
+        const api = await fetch(`/api/user/${session?.user._id}`, {
+          method: "GET",
+        });
+        const response: ResponseType = await api.json();
         if (response.success) {
           setUserData(response.data);
           setInitialData(response.data); // Store the initial data
@@ -59,11 +60,15 @@ const BasicUserDetailForm = () => {
     setSuccess("");
 
     try {
-      const api = await axios.post(`/api/user/${session?.user._id}`, {
+      const api = await fetch(`/api/user/${session?.user._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(userData),
       });
 
-      const res: ResponseType = await api.data;
+      const res: ResponseType = await api.json();
       if (!res.success) {
         setError(res.message);
       } else {
