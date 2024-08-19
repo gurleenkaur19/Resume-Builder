@@ -1,11 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { userFromType } from "@/type";
+import { useSession } from "next-auth/react";
+import { ResponseType, userFromType } from "@/type";
+import axios from "axios";
 
 const BasicUserDetailForm = () => {
+  const { data: session } = useSession();
+
   const [userData, setUserData] = useState<userFromType>({
     _id: "",
     firstName: "",
@@ -27,13 +31,60 @@ const BasicUserDetailForm = () => {
     setUserData({ ...userData, [event.target.name]: event.target.value });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const api = await axios.get(`/api/user/${session?.user._id}`);
+        const response = await api.data;
+        if (response.success) {
+          setUserData(response.data);
+          setInitialData(response.data); // Store the initial data
+        } else {
+          setError(response.message);
+        }
+      } catch (err: any) {
+        setError("Failed to fetch user data.");
+      }
+    };
+
+    if (session?.user._id) {
+      fetchData();
+    }
+  }, [session?.user._id]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const api = await axios.post(`/api/user/${session?.user._id}`, {
+        body: JSON.stringify(userData),
+      });
+
+      const res: ResponseType = await api.data;
+      if (!res.success) {
+        setError(res.message);
+      } else {
+        setUserData(res.data);
+        setInitialData(res.data); // Update initial data after successful save
+        setSuccess("User data saved successfully.");
+      }
+    } catch (error: any) {
+      setError("Failed to save user data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Function to check if form data has changed
   const hasChanges = () => {
     return JSON.stringify(userData) !== JSON.stringify(initialData);
   };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
         <Input type="hidden" name="_id" value={userData._id} />
         <div className="mb-4">
