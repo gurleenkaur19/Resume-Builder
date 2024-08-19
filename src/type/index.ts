@@ -59,3 +59,15 @@ export interface educationFormType {
   formNumber: number;
   description: string;
 }
+
+export interface projectFormType {
+  _id: string;
+  title: string;
+  description: string;
+  technologies: string[];
+  url: string;
+  startDate: Date;
+  endDate: Date;
+  userId: string;
+  formNumber: number;
+}
