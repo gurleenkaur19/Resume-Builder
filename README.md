@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Resume Builder
 
-## Getting Started
+## Overview
 
-First, run the development server:
+The Resume Builder is a web application designed to help users create, manage, and download their resumes. It utilizes Next.js for server-side rendering and dynamic routing, along with various libraries and components to enhance functionality and user experience.
+
+## Features
+
+- **User Authentication**: Sign in and sign up functionalities.
+- **Resume Creation**: Build and customize your resume.
+- **PDF Generation**: Export resumes as PDFs.
+- **Responsive Design**: Works well on both desktop and mobile devices.
+
+## Installation
+
+To get started with the Resume Builder, follow these steps:
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone <repository-url>
+    cd resume-builder
+   ```
+
+2. **Navigate to the project directory:**
+
+```bash
+cd resume-builder
+```
+
+3. **Install Dependencies:**
+
+```bash
+npm install
+```
+
+4. **Start the development server:**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The Resume Builder should now be running on [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Sign In or Sign Up
 
-## Learn More
+Visit the homepage and choose either the "Sign In" or "Sign Up" button to access your account or create a new one.
 
-To learn more about Next.js, take a look at the following resources:
+## Create a Resume
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Once logged in, you can start building your resume using the provided tools and templates.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Export as PDF
 
-## Deploy on Vercel
+Use the export feature to generate and download your resume as a PDF document.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Technologies Used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **Next.js**: Framework for server-side rendering and static site generation.
+- **React**: Library for building user interfaces.
+- **Tailwind CSS**: Utility-first CSS framework for styling.
+- **MongoDB**: Database for storing user data and resume information.
+- **axios**: For making HTTP requests.
+- **html2canvas**, **jspdf**: For PDF generation.
+
+## Contributing
+
+Contributions are welcome! To contribute:
+
+1. **Fork the repository**.
+2. **Create a new branch** for your changes.
+3. **Make your changes** and test them thoroughly.
+4. **Submit a pull request** with a detailed description of your changes.
